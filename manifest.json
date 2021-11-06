@@ -1,0 +1,27 @@
+{
+    "manifest_version": 2,
+    "name": "Twitch NoteBook",
+    "description": "Save messages for each twitch channel",
+    "version": "1.0",
+    "content_security_policy":
+        "script-src 'self' 'unsafe-eval'; object-src 'self'; img-src * data: 'self' 'unsafe-eval'",
+    "offline_enabled": true,
+    "permissions": ["tabs", "<all_urls>", "activeTab", "storage"],
+    "browser_action": {
+     "default_icon" : "icon.png",
+     "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["in-content.js"]
+        }
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "icons": {
+     "128" : "icon.png"
+    }
+   }
