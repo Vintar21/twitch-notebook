@@ -92,7 +92,7 @@ var currentButton;
 const initPopupScript = () => {
     // Access the background window object
     const backgroundWindow = chrome.extension.getBackgroundPage();
-    console = chrome.extension.getBackgroundPage().console;
+    // console = chrome.extension.getBackgroundPage().console;
     // Do anything with the exposed variables from background.js
     console.log(backgroundWindow?.sampleBackgroundGlobal);
     currentButton = copyButtonHTML;
@@ -130,15 +130,6 @@ const initPopupScript = () => {
         }
     });
 
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.executeScript(
-            tabs[0].id,
-            { code: 'var s = document.documentElement.outerHTML; chrome.runtime.sendMessage({action: "getSource", source: s});' }
-        );
-    });
-
-    console.log(document.getElementsByTagName('html')[0].innerHTML)
-
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
@@ -149,7 +140,6 @@ const initPopupScript = () => {
                 updateList();
             }
         })
-        // save(tab.url, '["test", "test2"]');
 
         // port = chrome.tabs.connect(tab.id, { name: 'Twitch Notepad' });
         // // Set up the message listener
@@ -160,7 +150,6 @@ const initPopupScript = () => {
 };
 
 const updateButtons = () => {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaa')
     if (document.getElementById('delete-button')) {
         document.getElementById('delete-button').addEventListener('click', function() {
             onDelete();
@@ -175,7 +164,7 @@ const updateButtons = () => {
 }
 
 const updateList = () => {
-    var listDiv = document.getElementById('list-container');
+    const listDiv = document.getElementById('list-container');
         
     var child = listDiv.lastElementChild; 
     while (child) {
@@ -200,21 +189,24 @@ const updateList = () => {
         const item = savedMessages[i];
         var element=document.createElement('div');
         element.setAttribute('class', 'list-element');
-        if (currentButton === copyButtonHTML) {
-            element.addEventListener('click', function() {
-                onCopy(item);
-            }, false);
-        } else if (currentButton === deleteButtonHTML) {
-            element.addEventListener('click', function() {
-                onDelete(item);
-            }, false);
-        }
-        
+        bindFunctionToButtons(element, item);
         const messageHTML = currentButton + item;
-        element.innerHTML = messageHTML;   // Use innerHTML to set the text
+        element.innerHTML = messageHTML;
         listDiv.appendChild(element);      
     }
     updateButtons();
+}
+
+const bindFunctionToButtons = (element, item) => {
+    if (currentButton === copyButtonHTML) {
+        element.addEventListener('click', function() {
+            onCopy(item);
+        }, false);
+    } else if (currentButton === deleteButtonHTML) {
+        element.addEventListener('click', function() {
+            onDelete(item);
+        }, false);
+    }
 }
 
 const getItems= (stringArray) => {
@@ -222,7 +214,6 @@ const getItems= (stringArray) => {
 }
 
 const onSwitch = () => {
-    console.log('zaaz')
     if (currentButton === copyButtonHTML) {
         currentButton = deleteButtonHTML;
     } else {
@@ -250,7 +241,6 @@ const onCopy = (item) => {
 }
 
 const onAdd = () => {
-    // console.log(document.getElementsByClassName('text-area').value)
     const newMessage = document.getElementById('new-message').value;
     if (currentTab?.url && newMessage.length > 0 && !savedMessages.includes(newMessage)) {
         savedMessages.push(newMessage);

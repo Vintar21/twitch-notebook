@@ -7,29 +7,6 @@
 
 // Extension port to communicate with the popup, also helps detecting when it closes
 let port = null;
-const console = chrome.extension.getBackgroundPage().console;
-// var images = document.getElementsByTagName('img');
-// for (var i = 0, l = images.length; i < l; i++) {
-//   images[i].src = 'http://placekitten.com/' + images[i].width + '/' + images[i].height;
-// }
-
-// chrome.runtime.onMessage.addListener(function(request, sender) {
-//     // console.log(request)
-//     if (request.action == "getSource") {
-//         var pageSource = request.source;
-//         const match = pageSource.match(/<textarea[^>]*>/);
-//         // var title = pageSource.match(/<textarea[^>]*>([^<]+)<\/textarea>/)[1];
-//         const newHTML = pageSource.replace(/(<textarea[^>]*>)/, /$1 test/);
-//         var div = document.createElement('body');
-//         div.innerHTML = newHTML;
-//         request.source = newHTML
-
-//         var doc = new DOMParser().parseFromString(newHTML, "text/xml");
-//         // console.log(newHTML)
-//         // console.log(document.documentElement.outerHTML)
-//         // document.documentElement.parentNode.replaceChild() = div;
-//     }
-// });
 
 // Send messages to the open port (Popup)
 const sendPortMessage = data => port.postMessage(data);
@@ -57,5 +34,3 @@ const handleBackgroundResponse = response =>
 
 // Send a message to background.js
 chrome.runtime.sendMessage('Message from in-content.js!', handleBackgroundResponse);
-console.log(document.getElementsByClassName('textarea'))
-console.log('aaAAAAAAAAAAAA')
