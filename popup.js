@@ -81,15 +81,21 @@
 var currentTab;
 var savedMessages;
 // var console;
+const copyButtonHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ';
+const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
+const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
+const switchCopyButtonHTML = '<a id="switch-button" class="switch-button fas fa-copy btn-primary"></a>';
+
+var currentButton;
 
 // Start the popup script, this could be anything from a simple script to a webapp
 const initPopupScript = () => {
     // Access the background window object
     const backgroundWindow = chrome.extension.getBackgroundPage();
-    // console = chrome.extension.getBackgroundPage().console;
+    console = chrome.extension.getBackgroundPage().console;
     // Do anything with the exposed variables from background.js
     console.log(backgroundWindow?.sampleBackgroundGlobal);
-
+    currentButton = copyButtonHTML;
     // This port enables a long-lived connection to in-content.js
     let port = null;
 
@@ -111,6 +117,10 @@ const initPopupScript = () => {
 
     document.getElementById('add-button').addEventListener('click', function() {
         onAdd();
+    }, false);
+
+    document.getElementById('switch-button').addEventListener('click', function() {
+        onSwitch();
     }, false);
 
     document.getElementById("new-message").addEventListener("keyup", function(event) {
@@ -149,6 +159,21 @@ const initPopupScript = () => {
     });
 };
 
+const updateButtons = () => {
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaa')
+    if (document.getElementById('delete-button')) {
+        document.getElementById('delete-button').addEventListener('click', function() {
+            onDelete();
+        }, false);
+    }
+
+    if (document.getElementById('copy-button')) {
+        document.getElementById('copy-button').addEventListener('click', function() {
+            onCopy();
+        }, false);
+    }
+}
+
 const updateList = () => {
     var listDiv = document.getElementById('list-container');
         
@@ -158,21 +183,52 @@ const updateList = () => {
         child = listDiv.lastElementChild;
     }
 
+    const settingsDiv = document.getElementById('settings');
+    settingsDiv.removeChild(settingsDiv.lastElementChild);
+
+    var switchButton = document.createElement('div');
+    switchButton.innerHTML = switchCopyButtonHTML;
+    if (currentButton === copyButtonHTML) {
+        switchButton.innerHTML = switchDeleteButtonHTML;
+    }
+    switchButton.firstChild.addEventListener('click', function() {
+        onSwitch();
+    });
+    settingsDiv.appendChild(switchButton);
+
     for (var i = 0; i < savedMessages.length; ++i) {
         const item = savedMessages[i];
         var element=document.createElement('div');
         element.setAttribute('class', 'list-element');
-        element.addEventListener('click', function() {
-            onCopy(item);
-        }, false);
-        const messageHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ' + item;
+        if (currentButton === copyButtonHTML) {
+            element.addEventListener('click', function() {
+                onCopy(item);
+            }, false);
+        } else if (currentButton === deleteButtonHTML) {
+            element.addEventListener('click', function() {
+                onDelete(item);
+            }, false);
+        }
+        
+        const messageHTML = currentButton + item;
         element.innerHTML = messageHTML;   // Use innerHTML to set the text
         listDiv.appendChild(element);      
     }
+    updateButtons();
 }
 
 const getItems= (stringArray) => {
     return JSON.parse(stringArray);
+}
+
+const onSwitch = () => {
+    console.log('zaaz')
+    if (currentButton === copyButtonHTML) {
+        currentButton = deleteButtonHTML;
+    } else {
+        currentButton = copyButtonHTML;
+    }
+    updateList();
 }
 
 const onDelete = (item) => {

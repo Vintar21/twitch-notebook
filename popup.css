@@ -9,6 +9,11 @@ body {
     color:crimson;
 }
 
+.switch-button {
+margin-right: 0px;
+  margin-left: 95%;
+}
+
 .fa-copy {
     color:mediumturquoise;
 }
