@@ -92,7 +92,7 @@ var currentButton;
 const initPopupScript = () => {
     // Access the background window object
     const backgroundWindow = chrome.extension.getBackgroundPage();
-    // console = chrome.extension.getBackgroundPage().console;
+    console = chrome.extension.getBackgroundPage().console;
     // Do anything with the exposed variables from background.js
     console.log(backgroundWindow?.sampleBackgroundGlobal);
     currentButton = copyButtonHTML;
@@ -200,7 +200,7 @@ const updateList = () => {
 const bindFunctionToButtons = (element, item) => {
     if (currentButton === copyButtonHTML) {
         element.addEventListener('click', function() {
-            onCopy(item);
+            onCopy(element, item);
         }, false);
     } else if (currentButton === deleteButtonHTML) {
         element.addEventListener('click', function() {
@@ -236,8 +236,31 @@ const onDelete = (item) => {
     }
 }
 
-const onCopy = (item) => {
+const onCopy = (element, item) => {
     copyToClipboard(item);
+    fade(element)
+}
+
+function fade(element) {
+    var op = 1;  // initial opacity
+    var fadeOut = setInterval(function () {
+        if (op <= 0.5){
+            op = 0.5;
+            clearInterval(fadeOut);
+            var fadeIn = setInterval(function () {
+                if (op >= 0.5){
+                    op = 1
+                    clearInterval(fadeIn);
+                }
+                element.style.opacity = op;
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op += op * 0.1;
+            }, 50);        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op -= op * 0.3;
+    }, 50);
+    
 }
 
 const onAdd = () => {
