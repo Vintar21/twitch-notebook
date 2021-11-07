@@ -80,7 +80,6 @@
 
 var currentTab;
 var savedMessages;
-// var console;
 const copyButtonHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ';
 const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
 const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
@@ -90,17 +89,9 @@ var currentButton;
 
 // Start the popup script, this could be anything from a simple script to a webapp
 const initPopupScript = () => {
-    // Access the background window object
-    const backgroundWindow = chrome.extension.getBackgroundPage();
-    console = chrome.extension.getBackgroundPage().console;
-    // Do anything with the exposed variables from background.js
-    console.log(backgroundWindow?.sampleBackgroundGlobal);
     currentButton = copyButtonHTML;
     // This port enables a long-lived connection to in-content.js
     let port = null;
-
-    // Send messages to the open port
-    const sendPortMessage = message => port.postMessage(message);
 
     // Find the current active tab
     const getTab = () => new Promise(resolve => {
@@ -109,11 +100,6 @@ const initPopupScript = () => {
             currentWindow: true
         }, tabs => resolve(tabs[0]));
     });
-
-    // Handle port messages
-    const messageHandler = message => {
-        console.log('popup.js - received message:', message);
-    };
 
     document.getElementById('add-button').addEventListener('click', function() {
         onAdd();
@@ -140,12 +126,6 @@ const initPopupScript = () => {
                 updateList();
             }
         })
-
-        // port = chrome.tabs.connect(tab.id, { name: 'Twitch Notepad' });
-        // // Set up the message listener
-        // port.onMessage.addListener(messageHandler);
-        // // Send a test message to in-content.js
-        // sendPortMessage('Message from popup!');
     });
 };
 
@@ -225,12 +205,8 @@ const onSwitch = () => {
 const onDelete = (item) => {
     const index = savedMessages.indexOf(item);
     if (index >= 0 && savedMessages.length > index) {
-        console.log(index);
-        console.log(item);
-        console.log(savedMessages);
         copyToClipboard(item);
         savedMessages.splice(index, 1)
-        console.log(savedMessages);
         save(currentTab.url, JSON.stringify(savedMessages));
         updateList();
     }
