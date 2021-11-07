@@ -80,14 +80,15 @@
 
 var currentTab;
 var savedMessages;
-const console = chrome.extension.getBackgroundPage().console;
+// var console;
 
 // Start the popup script, this could be anything from a simple script to a webapp
 const initPopupScript = () => {
     // Access the background window object
     const backgroundWindow = chrome.extension.getBackgroundPage();
+    // console = chrome.extension.getBackgroundPage().console;
     // Do anything with the exposed variables from background.js
-    console.log(backgroundWindow.sampleBackgroundGlobal);
+    console.log(backgroundWindow?.sampleBackgroundGlobal);
 
     // This port enables a long-lived connection to in-content.js
     let port = null;
