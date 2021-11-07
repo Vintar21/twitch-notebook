@@ -11,15 +11,6 @@
      "default_icon" : "icon.png",
      "default_popup": "popup.html"
     },
-    "background": {
-        "service_worker": "background.js"
-      },
-      "content_scripts": [
-        {
-          "matches": ["http://www.google.co.in/*","https://www.google.co.in/*"],
-          "js": ["content-test.js"]
-        }
-      ],
     "web_accessible_resources": [
         "popup.css"
       ],

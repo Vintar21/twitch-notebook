@@ -79,7 +79,7 @@
  */
 
 var currentTab;
-var savedMessages = [];
+var savedMessages;
 const copyButtonHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ';
 const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
 const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
@@ -119,19 +119,6 @@ const initPopupScript = () => {
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
-        chrome.tabs.executeScript(
-                tab.id,
-                {
-                    code: "document.body.style.backgroundColor = 'red'"
-                }
-          );
-
-          chrome.tabs.executeScript(
-            tab.id,
-            {
-                file: "content-test.js"
-            }
-      );    
         // Connects to tab port to enable communication with inContent.js
         chrome.storage.sync.get(/* String or Array */[tab.url], function(items){
             if (items[tab.url] !== undefined) {
@@ -141,10 +128,6 @@ const initPopupScript = () => {
         })
     });
 };
-
-// function reddenPage() {
-//     document.body.style.backgroundColor = 'red';
-//   }
 
 const updateButtons = () => {
     if (document.getElementById('delete-button')) {

@@ -1,0 +1,32 @@
+body {
+    min-height: auto;
+    min-width: 300px;
+    font-size: medium;
+    background-color: darkslategrey;
+}
+
+.fa-trash-alt {
+    color:crimson;
+}
+
+.switch-button {
+margin-right: 0px;
+  margin-left: 95%;
+}
+
+.fa-copy {
+    color:mediumturquoise;
+}
+
+.list-element { 
+    color: azure;}
+
+.list-container {
+    color:azure;
+}
+
+.delete-button {
+    background-color: transparent;
+}
+
+.adding-container { display: inline-block; } 
