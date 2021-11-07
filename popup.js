@@ -80,6 +80,7 @@
 
 var currentTab;
 var savedMessages;
+const console = chrome.extension.getBackgroundPage().console;
 
 // Start the popup script, this could be anything from a simple script to a webapp
 const initPopupScript = () => {
@@ -111,18 +112,35 @@ const initPopupScript = () => {
         onAdd();
     }, false);
 
+    document.getElementById("new-message").addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.key === 'Enter') {
+            document.getElementById('add-button').click();
+        }
+    });
+
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.executeScript(
+            tabs[0].id,
+            { code: 'var s = document.documentElement.outerHTML; chrome.runtime.sendMessage({action: "getSource", source: s});' }
+        );
+    });
+
+    console.log(document.getElementsByTagName('html')[0].innerHTML)
+
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
         // Connects to tab port to enable communication with inContent.js
         chrome.storage.sync.get(/* String or Array */[tab.url], function(items){
-            savedMessages = getItems(items[tab.url]);
-            updateList();
-
+            if (items[tab.url] !== undefined) {
+                savedMessages = getItems(items[tab.url]);
+                updateList();
+            }
         })
         // save(tab.url, '["test", "test2"]');
 
-        // port = chrome.tabs.connect(tab.id, { name: 'Twitch NoteBook' });
+        // port = chrome.tabs.connect(tab.id, { name: 'Twitch Notepad' });
         // // Set up the message listener
         // port.onMessage.addListener(messageHandler);
         // // Send a test message to in-content.js
@@ -132,23 +150,23 @@ const initPopupScript = () => {
 
 const updateList = () => {
     var listDiv = document.getElementById('list-container');
-    var list = document.getElementById('list');
-    var toAdd = [savedMessages[savedMessages.length-1]];
-    
-    chrome.extension.getBackgroundPage().console.log(listDiv.childElementCount);
-    if (!list) {
-        list=document.createElement('ul');
-        toAdd = savedMessages;
+        
+    var child = listDiv.lastElementChild; 
+    while (child) {
+        listDiv.removeChild(child);
+        child = listDiv.lastElementChild;
     }
-    for (var i = 0; i < toAdd.length; ++i) {
-        const item = toAdd[i];
-        var li=document.createElement('li');
-        li.innerHTML = item;   // Use innerHTML to set the text
-        list.appendChild(li);      
-    }
-    if (listDiv.childElementCount === 0) {
-        list.setAttribute('id', 'list');
-        listDiv.appendChild(list); 
+
+    for (var i = 0; i < savedMessages.length; ++i) {
+        const item = savedMessages[i];
+        var element=document.createElement('div');
+        element.setAttribute('class', 'list-element');
+        element.addEventListener('click', function() {
+            onCopy(item);
+        }, false);
+        const messageHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ' + item;
+        element.innerHTML = messageHTML;   // Use innerHTML to set the text
+        listDiv.appendChild(element);      
     }
 }
 
@@ -156,15 +174,45 @@ const getItems= (stringArray) => {
     return JSON.parse(stringArray);
 }
 
-const onAdd = () => {
-    chrome.extension.getBackgroundPage().console.log(currentTab);
-    const newMessage = document.getElementById('new-message').value;
-    if (currentTab?.url && newMessage.length > 0) {
-        savedMessages.push(newMessage);
+const onDelete = (item) => {
+    const index = savedMessages.indexOf(item);
+    if (index >= 0 && savedMessages.length > index) {
+        console.log(index);
+        console.log(item);
+        console.log(savedMessages);
+        copyToClipboard(item);
+        savedMessages.splice(index, 1)
+        console.log(savedMessages);
         save(currentTab.url, JSON.stringify(savedMessages));
         updateList();
     }
 }
+
+const onCopy = (item) => {
+    copyToClipboard(item);
+}
+
+const onAdd = () => {
+    // console.log(document.getElementsByClassName('text-area').value)
+    const newMessage = document.getElementById('new-message').value;
+    if (currentTab?.url && newMessage.length > 0 && !savedMessages.includes(newMessage)) {
+        savedMessages.push(newMessage);
+        save(currentTab.url, JSON.stringify(savedMessages));
+        updateList();
+        document.getElementById('new-message').value = '';
+    }
+}
+
+function copyToClipboard(text) {
+    const input = document.createElement('input');
+    input.style.position = 'fixed';
+    input.style.opacity = 0;
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('Copy');
+    document.body.removeChild(input);
+  };
 
 const save = (url, messages) => {
     var entry = {};

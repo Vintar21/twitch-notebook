@@ -1,16 +1,18 @@
 <!doctype html>
-<html style="min-height:auto" >
+<html>
     <head>
-        <title>chrome-extension-template</title>
+        <title>twitch-notepad</title>
+        <link rel="stylesheet" type="text/css" href="popup.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
         <script src="popup.js"></script>
     </head>
-    <body>
-    </body>
-    <body>
+    <body class="popup-body">
         <div id="list-container">
         </div>
 
-        <input type="text" id="new-message" placeholder="New message">
-        <button type="button" id="add-button">Add</button>
+        <div class="adding-container">
+            <input type="text" id="new-message" placeholder="New message">
+            <button type="button" id="add-button">Add</button>
+        </div>
     </body>
 </html>
