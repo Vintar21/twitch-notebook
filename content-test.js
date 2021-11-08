@@ -1,3 +1,4 @@
+//TODO: find a better way to load an unique listener in the content script
 var unique = document.body.getAttribute('unique');
 if ( !unique || unique !== 'true') {
   document.body.setAttribute('unique', 'true')
@@ -13,9 +14,6 @@ if ( !unique || unique !== 'true') {
     }
   );
 }
-
-
-
 
 function sendMessageInTwitchChat(message) {
   var twitchChat = getAllElementsWithAttribute('data-a-target', 'chat-input')[0];

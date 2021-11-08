@@ -1,71 +1,3 @@
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports) {
 
 /* popup.js
  *
@@ -78,6 +10,7 @@
  *
  */
 
+//TODO Avoid global declaration -> save const in an util or something
 var currentTab;
 var savedMessages = [];
 const copyButtonHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ';
@@ -90,8 +23,6 @@ var currentButton;
 // Start the popup script, this could be anything from a simple script to a webapp
 const initPopupScript = () => {
     currentButton = copyButtonHTML;
-    // This port enables a long-lived connection to in-content.js
-    let port = null;
 
     // Find the current active tab
     const getTab = () => new Promise(resolve => {
@@ -100,12 +31,6 @@ const initPopupScript = () => {
             currentWindow: true
         }, tabs => resolve(tabs[0]));
     });
-
-    // const sendPortMessage = message => port.postMessage(message);
-    // // Handle port messages
-    // const messageHandler = message => {
-    //     console.log('popup.js - received message:', message);
-    // };
 
     document.getElementById('add-button').addEventListener('click', function() {
         onAdd();
@@ -122,23 +47,12 @@ const initPopupScript = () => {
         }
     });
 
-    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    //     chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage"}, function(response){
-    //         console.log('response');
-    //     });
-    // });
-
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
 
-        // port = chrome.tabs.connect(tab.id, { name: 'Twitch Notepad' });
-        // // Set up the message listener
-        // port.onMessage.addListener(messageHandler);
-        // // Send a test message to in-content.js
-        // sendPortMessage('Message from popup!');
-
         // TODO bizarre de devoir l'exec comme ça
+        // voir versions précédentes avec connection via un port ?
         chrome.tabs.executeScript(
             tab.id,
             {
@@ -146,7 +60,7 @@ const initPopupScript = () => {
             }
         );    
         // Connects to tab port to enable communication with inContent.js
-        chrome.storage.sync.get(/* String or Array */[tab.url], function(items){
+        chrome.storage.sync.get([tab.url], function(items){
             if (items[tab.url] !== undefined) {
                 savedMessages = getItems(items[tab.url]);
                 updateList();
@@ -154,10 +68,6 @@ const initPopupScript = () => {
         })
     });
 };
-
-// function reddenPage() {
-//     document.body.style.backgroundColor = 'red';
-//   }
 
 const updateButtons = () => {
     if (document.getElementById('delete-button')) {
@@ -276,6 +186,7 @@ function fade(element) {
     
 }
 
+//TODO: change all declarations in function declaration
 const onAdd = () => {
     const newMessage = document.getElementById('new-message').value;
     if (currentTab?.url && newMessage.length > 0 && !savedMessages.includes(newMessage)) {
@@ -307,7 +218,3 @@ const save = (url, messages) => {
 
 // Fire scripts after page has loaded
 document.addEventListener('DOMContentLoaded', initPopupScript);
-
-/***/ })
-/******/ ]);
-//# sourceMappingURL=popup.js.map
