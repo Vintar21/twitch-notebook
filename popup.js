@@ -101,6 +101,12 @@ const initPopupScript = () => {
         }, tabs => resolve(tabs[0]));
     });
 
+    // const sendPortMessage = message => port.postMessage(message);
+    // // Handle port messages
+    // const messageHandler = message => {
+    //     console.log('popup.js - received message:', message);
+    // };
+
     document.getElementById('add-button').addEventListener('click', function() {
         onAdd();
     }, false);
@@ -116,22 +122,29 @@ const initPopupScript = () => {
         }
     });
 
+    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    //     chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage"}, function(response){
+    //         console.log('response');
+    //     });
+    // });
+
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
-        chrome.tabs.executeScript(
-                tab.id,
-                {
-                    code: "document.body.style.backgroundColor = 'red'"
-                }
-          );
 
-          chrome.tabs.executeScript(
+        // port = chrome.tabs.connect(tab.id, { name: 'Twitch Notepad' });
+        // // Set up the message listener
+        // port.onMessage.addListener(messageHandler);
+        // // Send a test message to in-content.js
+        // sendPortMessage('Message from popup!');
+
+        // TODO bizarre de devoir l'exec comme ça
+        chrome.tabs.executeScript(
             tab.id,
             {
                 file: "content-test.js"
             }
-      );    
+        );    
         // Connects to tab port to enable communication with inContent.js
         chrome.storage.sync.get(/* String or Array */[tab.url], function(items){
             if (items[tab.url] !== undefined) {
@@ -194,6 +207,12 @@ const updateList = () => {
     updateButtons();
 }
 
+const sendMessageOnChat = (message) => {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage", value:message});
+        });
+}
+
 const bindFunctionToButtons = (element, item) => {
     if (currentButton === copyButtonHTML) {
         element.addEventListener('click', function() {
@@ -232,6 +251,7 @@ const onDelete = (item) => {
 const onCopy = (element, item) => {
     copyToClipboard(item);
     fade(element)
+    sendMessageOnChat(item)
 }
 
 function fade(element) {
