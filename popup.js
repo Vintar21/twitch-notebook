@@ -13,15 +13,15 @@
 //TODO Avoid global declaration -> save const in an util or something
 var currentTab;
 var savedMessages = [];
-const copyButtonHTML = '<a class="copy-button fas fa-copy btn-primary"></a> ';
+const copyButtonHTML = '<a class="copy-button fas fa-play btn-primary"></a> ';
 const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
 const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
-const switchCopyButtonHTML = '<a id="switch-button" class="switch-button fas fa-copy btn-primary"></a>';
+const switchCopyButtonHTML = '<a id="switch-button" class="switch-button fas fa-play btn-primary"></a>';
 
 var currentButton;
 
 // Start the popup script, this could be anything from a simple script to a webapp
-const initPopupScript = () => {
+function initPopupScript() {
     currentButton = copyButtonHTML;
 
     // Find the current active tab
@@ -40,7 +40,13 @@ const initPopupScript = () => {
         onSwitch();
     }, false);
 
-    document.getElementById("new-message").addEventListener("keyup", function(event) {
+    document.getElementById("new-message-content").addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.key === 'Enter') {
+            document.getElementById('add-button').click();
+        }
+    });
+    document.getElementById("new-message-title").addEventListener("keyup", function(event) {
         event.preventDefault();
         if (event.key === 'Enter') {
             document.getElementById('add-button').click();
@@ -69,7 +75,7 @@ const initPopupScript = () => {
     });
 };
 
-const updateButtons = () => {
+function updateButtons() {
     if (document.getElementById('delete-button')) {
         document.getElementById('delete-button').addEventListener('click', function() {
             onDelete();
@@ -83,7 +89,7 @@ const updateButtons = () => {
     }
 }
 
-const updateList = () => {
+function updateList() {
     const listDiv = document.getElementById('list-container');
         
     var child = listDiv.lastElementChild; 
@@ -104,26 +110,30 @@ const updateList = () => {
         onSwitch();
     });
     settingsDiv.appendChild(switchButton);
-
+    console.log(savedMessages);
     for (var i = 0; i < savedMessages.length; ++i) {
         const item = savedMessages[i];
         var element=document.createElement('div');
-        element.setAttribute('class', 'list-element');
+        element.setAttribute('class', 'card container tooltip');
         bindFunctionToButtons(element, item);
-        const messageHTML = currentButton + item;
+        const messageHTML = currentButton + '<b> ' + item.title + '</b>';
         element.innerHTML = messageHTML;
+        var tooltip = document.createElement('span');
+        tooltip.setAttribute('class', 'tooltiptext');
+        tooltip.innerHTML = item.content;
+        element.appendChild(tooltip);
         listDiv.appendChild(element);      
     }
     updateButtons();
 }
 
-const sendMessageOnChat = (message) => {
+function sendMessageOnChat(message) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage", value:message});
+        chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage", message: message});
         });
 }
 
-const bindFunctionToButtons = (element, item) => {
+function bindFunctionToButtons(element, item) {
     if (currentButton === copyButtonHTML) {
         element.addEventListener('click', function() {
             onCopy(element, item);
@@ -135,11 +145,18 @@ const bindFunctionToButtons = (element, item) => {
     }
 }
 
-const getItems= (stringArray) => {
-    return JSON.parse(stringArray);
+function getItems(stringArray) {
+    // FIX for saved messages before the title feature 
+    var rawItems = JSON.parse(stringArray);
+    for(var i = 0; i < rawItems.length; i++) {
+        if (rawItems[i]?.title === undefined) {
+            rawItems[i] = {title: rawItems[i], content: rawItems[i]};
+        }
+    }
+    return rawItems;
 }
 
-const onSwitch = () => {
+function onSwitch() {
     if (currentButton === copyButtonHTML) {
         currentButton = deleteButtonHTML;
     } else {
@@ -148,18 +165,17 @@ const onSwitch = () => {
     updateList();
 }
 
-const onDelete = (item) => {
+function onDelete(item) {
     const index = savedMessages.indexOf(item);
     if (index >= 0 && savedMessages.length > index) {
-        copyToClipboard(item);
         savedMessages.splice(index, 1)
         save(currentTab.url, JSON.stringify(savedMessages));
         updateList();
     }
 }
 
-const onCopy = (element, item) => {
-    copyToClipboard(item);
+function onCopy(element, item) {
+    copyToClipboard(item.content);
     fade(element)
     sendMessageOnChat(item)
 }
@@ -186,14 +202,18 @@ function fade(element) {
     
 }
 
-//TODO: change all declarations in function declaration
-const onAdd = () => {
-    const newMessage = document.getElementById('new-message').value;
-    if (currentTab?.url && newMessage.length > 0 && !savedMessages.includes(newMessage)) {
-        savedMessages.push(newMessage);
+function onAdd() {
+    const newMessage = document.getElementById('new-message-content').value;
+    var newMessageTitle = document.getElementById('new-message-title').value;
+    newMessageTitle = newMessageTitle === undefined || newMessageTitle === '' ?  newMessage : newMessageTitle;
+    
+    // TODO: function to check if content already exists
+    if (currentTab?.url && newMessage.length > 0 /*&& !savedMessages.includes(newMessage)*/) {
+        savedMessages.push({title: newMessageTitle, content: newMessage});
         save(currentTab.url, JSON.stringify(savedMessages));
         updateList();
-        document.getElementById('new-message').value = '';
+        document.getElementById('new-message-content').value = '';
+        document.getElementById('new-message-title').value = '';
     }
 }
 
@@ -208,7 +228,7 @@ function copyToClipboard(text) {
     document.body.removeChild(input);
   };
 
-const save = (url, messages) => {
+function save(url, messages) {
     var entry = {};
     entry[url] = messages;
     chrome.storage.sync.set(entry, function(){

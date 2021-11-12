@@ -17,6 +17,7 @@
           "js": ["content-test.js"]
         }
       ],
+
     "web_accessible_resources": [
         "popup.css"
       ],

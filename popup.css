@@ -1,8 +1,10 @@
 body {
-    min-height: auto;
-    min-width: 300px;
+    min-height: fit-content;
+    min-width: 350px;
+    max-width: 750px;
+    width: auto;
     font-size: medium;
-    background-color: darkslategrey;
+    background-color:rgb(25,25,25);
 }
 
 .fa-trash-alt {
@@ -10,7 +12,7 @@ body {
 }
 
 .switch-button {
-margin-right: 0px;
+  margin-right: 0px;
   margin-left: 95%;
 }
 
@@ -18,8 +20,9 @@ margin-right: 0px;
     color:mediumturquoise;
 }
 
-.list-element { 
-    color: azure;}
+.fa-play {
+    color:mediumturquoise;
+}
 
 .list-container {
     color:azure;
@@ -29,4 +32,84 @@ margin-right: 0px;
     background-color: transparent;
 }
 
+hr {
+  border-color: #555;
+}
+
+input {
+  margin: 2px 0;
+  box-sizing: border-box;
+}
+
 .adding-container { display: inline-block; } 
+
+.card {
+    background-color:rgb(35,35,35);
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(60,60,60,60.2);
+    transition: 0.3s;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    width: fit-content;
+    display: inline-block;
+    
+}
+  
+  /* On mouse-over, add a deeper shadow */
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(60,60,60,0.2);
+  }
+  
+  /* Add some padding inside the card container */
+  .container {
+    padding: 2px 16px;
+    color:azure;
+  }
+  
+
+
+  /* Tooltip container */
+.tooltip {
+  position: relative;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  min-width: 150px;
+  width: inherit;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s; 
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 15%;
+  margin-left: -75%;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
