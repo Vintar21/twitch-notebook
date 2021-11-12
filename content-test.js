@@ -7,7 +7,7 @@ if ( !unique || unique !== 'true') {
     function(message, sender, sendResponse) {
         switch(message.type) {
             case "sendMessage":
-              sendMessageInTwitchChat(message.value);
+              sendMessageInTwitchChat(message.message.content);
             break;
         }
         return true;

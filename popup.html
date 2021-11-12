@@ -7,15 +7,17 @@
         <script src="popup.js" type="text/javascript"></script>
     </head>
     <body class="popup-body">
-        <div id="settings" class="mb-3">
+        <div id="settings">
             <a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>
-        </div>
+        </div>        
+        
         <div id="list-container">
         </div>
 
         <hr>
+        <input type="text" id="new-message-title" placeholder="Title" style="width: 80%;">
         <div class="adding-container" style="width: 100%;">
-            <input type="text" id="new-message" placeholder="New message" style="width: 80%;">
+            <input type="text" id="new-message-content" placeholder="New message" style="width: 80%;">
             <button type="button" id="add-button" style="width: 15%;">Add</button>
         </div>
     </body>
