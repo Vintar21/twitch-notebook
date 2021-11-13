@@ -71,6 +71,7 @@ function initPopupScript() {
     });
 };
 
+//TODO put in an utils (used in popup and content)
 function getKeyFromURL(url) {
     //TODO: A voir avec les squads
     if (url.match(/^https:\/\/www.twitch.tv\/(moderator\/)?[^\/]+$/)) {
