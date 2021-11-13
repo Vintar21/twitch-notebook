@@ -1,4 +1,3 @@
-
 /* popup.js
  *
  * This file initializes its scripts after the popup has loaded.
@@ -10,14 +9,27 @@
  *
  */
 
-//TODO Avoid global declaration -> save const in an util or something
-var currentTab;
-var savedMessages = [];
+/* CONST */
 const copyButtonHTML = '<a class="copy-button fas fa-play btn-primary"></a> ';
 const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
 const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
 const switchCopyButtonHTML = '<a id="switch-button" class="switch-button fas fa-play btn-primary"></a>';
 
+const cardClass = 'card';
+const cardContentClass = 'card-content';
+
+const settingsId = 'settings';
+const addButtonId = 'add-button';
+const switchButtonId = 'switch-button';
+const deleteButtonId = 'delete-button';
+const playButtonId = 'play-button';
+const listContainerId = 'list-container';
+const newMessageTitleId = 'new-message-title';
+const newMessageContentId = 'new-message-content'
+
+//TODO Avoid global declaration -> save const in an util or something
+var currentTab;
+var savedMessages = [];
 var currentButton;
 
 // Start the popup script, this could be anything from a simple script to a webapp
@@ -32,24 +44,24 @@ function initPopupScript() {
         }, tabs => resolve(tabs[0]));
     });
 
-    document.getElementById('add-button').addEventListener('click', function() {
+    document.getElementById(addButtonId).addEventListener('click', function() {
         onAdd();
     }, false);
 
-    document.getElementById('switch-button').addEventListener('click', function() {
+    document.getElementById(switchButtonId).addEventListener('click', function() {
         onSwitch();
     }, false);
 
-    document.getElementById("new-message-content").addEventListener("keyup", function(event) {
+    document.getElementById(newMessageContentId).addEventListener('keyup', function(event) {
         event.preventDefault();
         if (event.key === 'Enter') {
-            document.getElementById('add-button').click();
+            document.getElementById(addButtonId).click();
         }
     });
-    document.getElementById("new-message-title").addEventListener("keyup", function(event) {
+    document.getElementById(newMessageTitleId).addEventListener('keyup', function(event) {
         event.preventDefault();
         if (event.key === 'Enter') {
-            document.getElementById('add-button').click();
+            document.getElementById(addButtonId).click();
         }
     });
 
@@ -62,7 +74,7 @@ function initPopupScript() {
         chrome.tabs.executeScript(
             tab.id,
             {
-                file: "content-test.js"
+                file: 'content-test.js'
             }
         );    
         // Connects to tab port to enable communication with inContent.js
@@ -76,21 +88,21 @@ function initPopupScript() {
 };
 
 function updateButtons() {
-    if (document.getElementById('delete-button')) {
-        document.getElementById('delete-button').addEventListener('click', function() {
+    if (document.getElementById(deleteButtonId)) {
+        document.getElementById(deleteButtonId).addEventListener('click', function() {
             onDelete();
         }, false);
     }
 
-    if (document.getElementById('copy-button')) {
-        document.getElementById('copy-button').addEventListener('click', function() {
+    if (document.getElementById(playButtonId)) {
+        document.getElementById(playButtonId).addEventListener('click', function() {
             onCopy();
         }, false);
     }
 }
 
 function updateList() {
-    const listDiv = document.getElementById('list-container');
+    const listDiv = document.getElementById(listContainerId);
         
     var child = listDiv.lastElementChild; 
     while (child) {
@@ -98,7 +110,7 @@ function updateList() {
         child = listDiv.lastElementChild;
     }
 
-    const settingsDiv = document.getElementById('settings');
+    const settingsDiv = document.getElementById(settingsId);
     settingsDiv.removeChild(settingsDiv.lastElementChild);
 
     var switchButton = document.createElement('div');
@@ -114,22 +126,18 @@ function updateList() {
     for (var i = 0; i < savedMessages.length; ++i) {
         const item = savedMessages[i];
         var element=document.createElement('div');
-        element.setAttribute('class', 'card container tooltip');
-        bindFunctionToButtons(element, item);
-        const messageHTML = currentButton + '<b> ' + item.title + '</b>';
+        element.setAttribute('class', cardClass);
+        const messageHTML = currentButton + '<b>' + item.title + '</b>';
         element.innerHTML = messageHTML;
-        var tooltip = document.createElement('span');
-        tooltip.setAttribute('class', 'tooltiptext');
-        tooltip.innerHTML = item.content;
-        element.appendChild(tooltip);
-        listDiv.appendChild(element);      
+        listDiv.appendChild(element);
+        bindFunctionToButtons(element, item);
     }
     updateButtons();
 }
 
 function sendMessageOnChat(message) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {type:"sendMessage", message: message});
+        chrome.tabs.sendMessage(tabs[0].id, {type:'sendMessage', message: message});
         });
 }
 
@@ -143,6 +151,40 @@ function bindFunctionToButtons(element, item) {
             onDelete(item);
         }, false);
     }
+
+    element.addEventListener('mouseover', function() {
+        const content = document.createElement('div');
+        content.setAttribute('class', cardContentClass);
+        content.innerHTML = item.content;
+        element.appendChild(content);
+    });
+
+    element.addEventListener('mouseout', function() {
+        element.removeChild(getChild(element, cardContentClass));
+
+    });
+}
+
+function onMouseLeave(e)
+{
+    if (!e) var e = window.event;
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+}
+
+function getChild(element, childClass) {
+    var foundChild = undefined;
+    if(element.children.length > 0) {
+        var child = element.lastElementChild;
+        while (child) {
+            if (child.getAttribute('class') === childClass) {
+                foundChild = child;
+                break;
+            }
+        }
+    }
+
+    return foundChild;
 }
 
 function getItems(stringArray) {
@@ -192,19 +234,19 @@ function fade(element) {
                     clearInterval(fadeIn);
                 }
                 element.style.opacity = op;
-                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                element.style.filter = 'alpha(opacity=' + op * 100 + ')';
                 op += op * 0.1;
             }, 50);        }
         element.style.opacity = op;
-        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        element.style.filter = 'alpha(opacity=' + op * 100 + ')';
         op -= op * 0.3;
     }, 50);
     
 }
 
 function onAdd() {
-    const newMessage = document.getElementById('new-message-content').value;
-    var newMessageTitle = document.getElementById('new-message-title').value;
+    const newMessage = document.getElementById(newMessageContentId).value;
+    var newMessageTitle = document.getElementById(newMessageTitleId).value;
     newMessageTitle = newMessageTitle === undefined || newMessageTitle === '' ?  newMessage : newMessageTitle;
     
     // TODO: function to check if content already exists
@@ -212,8 +254,8 @@ function onAdd() {
         savedMessages.push({title: newMessageTitle, content: newMessage});
         save(currentTab.url, JSON.stringify(savedMessages));
         updateList();
-        document.getElementById('new-message-content').value = '';
-        document.getElementById('new-message-title').value = '';
+        document.getElementById(newMessageContentId).value = '';
+        document.getElementById(newMessageTitleId).value = '';
     }
 }
 
