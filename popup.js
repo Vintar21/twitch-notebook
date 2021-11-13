@@ -61,14 +61,6 @@ function initPopupScript() {
     getTab().then(tab => {
         currentTab = tab;
 
-        // TODO bizarre de devoir l'exec comme ça
-        // voir versions précédentes avec connection via un port ?
-        chrome.tabs.executeScript(
-            tab.id,
-            {
-                file: 'content.js'
-            }
-        );    
         // Connects to tab port to enable communication with inContent.js
         chrome.storage.sync.get([getKeyFromURL(tab.url)], function(items){
             if (items[getKeyFromURL(tab.url)] !== undefined) {
