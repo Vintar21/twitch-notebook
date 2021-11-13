@@ -10,10 +10,10 @@
  */
 
 /* CONST */
-const copyButtonHTML = '<a class="copy-button fas fa-play btn-primary"></a> ';
-const deleteButtonHTML = '<a class="delete-button fas fa-trash-alt btn-primary"></a> ';
-const switchDeleteButtonHTML = '<a id="switch-button" class="switch-button fas fa-trash-alt btn-primary"></a>';
-const switchCopyButtonHTML = '<a id="switch-button" class="switch-button fas fa-play btn-primary"></a>';
+const copyButtonClass = 'copy-button fas fa-play btn-primary';
+const deleteButtonClass = 'delete-button fas fa-trash-alt btn-primary';
+const switchDeleteButtonClass = 'switch-button fas fa-trash-alt btn-primary';
+const switchCopyButtonClass = 'switch-button fas fa-play btn-primary';
 
 const cardClass = 'card';
 const cardContentClass = 'card-content';
@@ -34,21 +34,13 @@ var currentButton;
 
 // Start the popup script, this could be anything from a simple script to a webapp
 function initPopupScript() {
-    currentButton = copyButtonHTML;
-
-    // Find the current active tab
-    const getTab = () => new Promise(resolve => {
-        chrome.tabs.query({
-            active: true,
-            currentWindow: true
-        }, tabs => resolve(tabs[0]));
-    });
+    currentButton = copyButtonClass;
 
     document.getElementById(addButtonId).addEventListener('click', function() {
         onAdd();
     }, false);
 
-    document.getElementById(switchButtonId).addEventListener('click', function() {
+    document.getElementsByClassName(switchButtonId)[0].addEventListener('click', function() {
         onSwitch();
     }, false);
 
@@ -74,7 +66,7 @@ function initPopupScript() {
         chrome.tabs.executeScript(
             tab.id,
             {
-                file: 'content-test.js'
+                file: 'content.js'
             }
         );    
         // Connects to tab port to enable communication with inContent.js
@@ -113,26 +105,32 @@ function updateList() {
     const settingsDiv = document.getElementById(settingsId);
     settingsDiv.removeChild(settingsDiv.lastElementChild);
 
-    var switchButton = document.createElement('div');
-    switchButton.innerHTML = switchCopyButtonHTML;
-    if (currentButton === copyButtonHTML) {
-        switchButton.innerHTML = switchDeleteButtonHTML;
+    var switchButton = getButtonElement(switchCopyButtonClass);
+    if (currentButton === copyButtonClass) {
+        switchButton = getButtonElement(switchDeleteButtonClass);
     }
-    switchButton.firstChild.addEventListener('click', function() {
+    switchButton.addEventListener('click', function() {
         onSwitch();
     });
     settingsDiv.appendChild(switchButton);
-    console.log(savedMessages);
+
     for (var i = 0; i < savedMessages.length; ++i) {
         const item = savedMessages[i];
-        var element=document.createElement('div');
-        element.setAttribute('class', cardClass);
-        const messageHTML = currentButton + '<b>' + item.title + '</b>';
-        element.innerHTML = messageHTML;
-        listDiv.appendChild(element);
-        bindFunctionToButtons(element, item);
+        listDiv.appendChild(createCardElement(item));
+
     }
     updateButtons();
+}
+
+function createCardElement(item) {
+    const element=document.createElement('div');
+    element.setAttribute('class', cardClass);
+    element.appendChild(getButtonElement(currentButton));
+    const title = document.createElement('b');
+    title.innerText = item.title;
+    element.appendChild(title);
+    bindFunctionToButtons(element, item);
+    return element;
 }
 
 function sendMessageOnChat(message) {
@@ -142,11 +140,11 @@ function sendMessageOnChat(message) {
 }
 
 function bindFunctionToButtons(element, item) {
-    if (currentButton === copyButtonHTML) {
+    if (currentButton === copyButtonClass) {
         element.addEventListener('click', function() {
             onCopy(element, item);
         }, false);
-    } else if (currentButton === deleteButtonHTML) {
+    } else if (currentButton === deleteButtonClass) {
         element.addEventListener('click', function() {
             onDelete(item);
         }, false);
@@ -155,7 +153,7 @@ function bindFunctionToButtons(element, item) {
     element.addEventListener('mouseover', function() {
         const content = document.createElement('div');
         content.setAttribute('class', cardContentClass);
-        content.innerHTML = item.content;
+        content.innerText = item.content;
         element.appendChild(content);
     });
 
@@ -163,13 +161,6 @@ function bindFunctionToButtons(element, item) {
         element.removeChild(getChild(element, cardContentClass));
 
     });
-}
-
-function onMouseLeave(e)
-{
-    if (!e) var e = window.event;
-    e.cancelBubble = true;
-    if (e.stopPropagation) e.stopPropagation();
 }
 
 function getChild(element, childClass) {
@@ -199,10 +190,10 @@ function getItems(stringArray) {
 }
 
 function onSwitch() {
-    if (currentButton === copyButtonHTML) {
-        currentButton = deleteButtonHTML;
+    if (currentButton === copyButtonClass) {
+        currentButton = deleteButtonClass;
     } else {
-        currentButton = copyButtonHTML;
+        currentButton = copyButtonClass;
     }
     updateList();
 }
@@ -278,5 +269,20 @@ function save(url, messages) {
 
 };
 
-// Fire scripts after page has loaded
+function getButtonElement(classString) {
+    const button = document.createElement('a');
+    button.setAttribute('class', classString);
+    return button;
+} 
+
+// Find the current active tab
+function getTab() {
+    return new Promise(resolve => {
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, tabs => resolve(tabs[0]));
+    });
+}
+
 document.addEventListener('DOMContentLoaded', initPopupScript);
