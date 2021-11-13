@@ -70,14 +70,22 @@ function initPopupScript() {
             }
         );    
         // Connects to tab port to enable communication with inContent.js
-        chrome.storage.sync.get([tab.url], function(items){
-            if (items[tab.url] !== undefined) {
-                savedMessages = getItems(items[tab.url]);
+        chrome.storage.sync.get([getKeyFromURL(tab.url)], function(items){
+            if (items[getKeyFromURL(tab.url)] !== undefined) {
+                savedMessages = getItems(items[getKeyFromURL(tab.url)]);
                 updateList();
             }
         })
     });
 };
+
+function getKeyFromURL(url) {
+    //TODO: A voir avec les squads
+    if (url.match(/^https:\/\/www.twitch.tv\/(moderator\/)?[^\/]+$/)) {
+        return url.split('?')[0].split('/')[url.split('/').length-1];
+    }
+    return url;
+}
 
 function updateButtons() {
     if (document.getElementById(deleteButtonId)) {
@@ -202,7 +210,7 @@ function onDelete(item) {
     const index = savedMessages.indexOf(item);
     if (index >= 0 && savedMessages.length > index) {
         savedMessages.splice(index, 1)
-        save(currentTab.url, JSON.stringify(savedMessages));
+        save(getKeyFromURL(currentTab.url), JSON.stringify(savedMessages));
         updateList();
     }
 }
@@ -243,7 +251,7 @@ function onAdd() {
     // TODO: function to check if content already exists
     if (currentTab?.url && newMessage.length > 0 /*&& !savedMessages.includes(newMessage)*/) {
         savedMessages.push({title: newMessageTitle, content: newMessage});
-        save(currentTab.url, JSON.stringify(savedMessages));
+        save(getKeyFromURL(currentTab.url), JSON.stringify(savedMessages));
         updateList();
         document.getElementById(newMessageContentId).value = '';
         document.getElementById(newMessageTitleId).value = '';
