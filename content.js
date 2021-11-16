@@ -13,7 +13,7 @@ function onReady() {
       chrome.storage.sync.get([twitchChannel], function(items){
         if (items[twitchChannel] !== undefined) {
           var savedMessages = getItems(items[twitchChannel]);
-          const title = twitchChat.value;
+          const title = twitchChat.value.trim().replace(/\s\s+/, ' ');
           const message = savedMessages.find(m => m.title === title);
           if (message) {
             sendMessageInTwitchChat(message.content);

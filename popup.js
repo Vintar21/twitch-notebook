@@ -239,7 +239,7 @@ function fade(element) {
 function onAdd() {
     const newMessage = document.getElementById(newMessageContentId).value;
     var newMessageTitle = document.getElementById(newMessageTitleId).value;
-    newMessageTitle = newMessageTitle === undefined || newMessageTitle === '' ?  newMessage : newMessageTitle;
+    newMessageTitle = newMessageTitle === undefined || newMessageTitle === '' ?  newMessage : newMessageTitle.trim().replace(/\s\s+/, ' ');
     
     // TODO: function to check if content already exists
     if (currentTab?.url && newMessage.length > 0 /*&& !savedMessages.includes(newMessage)*/) {
