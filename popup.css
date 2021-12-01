@@ -5,7 +5,22 @@ body {
   width: auto;
   font-size: medium;
   background-color: rgb(25, 25, 25);
-  padding-bottom: 50px;
+  padding-bottom: 70px;
+}
+
+footer {
+  background-color: rgb(25, 25, 25);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  margin-left: -5px;;
+  padding-bottom: 10px;
+}
+
+.error-div {
+  color:red;
+  padding-bottom: 3px;
+  font-size: small;
 }
 
 .switch-button {

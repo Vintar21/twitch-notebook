@@ -60,7 +60,6 @@ function initPopupScript() {
     // Find the current active tab, then open a port to it
     getTab().then(tab => {
         currentTab = tab;
-
         // Connects to tab port to enable communication with inContent.js
         chrome.storage.sync.get([getKeyFromURL(tab.url)], function(items){
             if (items[getKeyFromURL(tab.url)] !== undefined) {
@@ -241,14 +240,24 @@ function onAdd() {
     var newMessageTitle = document.getElementById(newMessageTitleId).value;
     newMessageTitle = newMessageTitle === undefined || newMessageTitle === '' ?  newMessage : newMessageTitle.trim().replace(/\s\s+/, ' ');
     
-    // TODO: function to check if content already exists
-    if (currentTab?.url && newMessage.length > 0 /*&& !savedMessages.includes(newMessage)*/) {
+    if (checkTitleMessageNotExists(newMessageTitle)) {
+        document.getElementsByClassName('error-div')[0].innerText = 'A message with the same title already exists';
+    }
+    else if (newMessage.length === 0) {
+        document.getElementsByClassName('error-div')[0].innerText = 'You cannot save an empty message';
+    }
+    else if (currentTab?.url) {
+        document.getElementsByClassName('error-div')[0].innerText = '';
         savedMessages.push({title: newMessageTitle, content: newMessage});
         save(getKeyFromURL(currentTab.url), JSON.stringify(savedMessages));
         updateList();
         document.getElementById(newMessageContentId).value = '';
         document.getElementById(newMessageTitleId).value = '';
     }
+}
+
+function checkTitleMessageNotExists(title) {
+    return savedMessages.some(savedMessage => savedMessage.title === title);
 }
 
 function copyToClipboard(text) {

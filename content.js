@@ -1,4 +1,13 @@
 window.addEventListener ("load", onReady, false);
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.message === 'urlChanged') {
+      console.log(request.url)
+      // should wait until ready
+      onReady();
+    }
+});
+
 
 function onReady() {
 
@@ -19,7 +28,6 @@ function onReady() {
             sendMessageInTwitchChat(message.content);
           }
         }
-          
       });
     }    
   });
