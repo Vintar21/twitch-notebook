@@ -150,15 +150,19 @@ function bindFunctionToButtons(element, item) {
         }, false);
     }
 
+    const content = document.createElement('div');
+    content.setAttribute('class', cardContentClass);
+    content.innerText = item.content;
+    content.style.display = "none";
+    element.appendChild(content);
+
     element.addEventListener('mouseover', function() {
-        const content = document.createElement('div');
-        content.setAttribute('class', cardContentClass);
-        content.innerText = item.content;
-        element.appendChild(content);
+        getChild(element, cardContentClass).style.display = "block";
+
     });
 
     element.addEventListener('mouseout', function() {
-        element.removeChild(getChild(element, cardContentClass));
+        getChild(element, cardContentClass).style.display = "none";
 
     });
 }
