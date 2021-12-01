@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === 'urlChanged') {
       console.log(request.url)
       // should wait until ready
-      onReady();
+      waitForElementToDisplay("#div1",onReady,500,9000);
     }
 });
 
@@ -49,20 +49,6 @@ function onReady() {
     twitchChat.dispatchEvent(new Event('input', { bubbles: true }));
     chatButton.click();
   }
-  
-  function getAllElementsWithAttribute(attribute, value) {
-    var matchingElements = [];
-    var allElements = document.getElementsByTagName('*');
-    for (var i = 0, n = allElements.length; i < n; i++)
-    {
-      if (allElements[i].getAttribute(attribute) === value)
-      {
-        // Element exists with attribute. Add to array.
-        matchingElements.push(allElements[i]);
-      }
-    }
-    return matchingElements;
-  }
 }
 
 
@@ -84,4 +70,37 @@ function getItems(stringArray) {
       }
   }
   return rawItems;
+}
+
+function waitForElementToDisplay(selector, callback, checkFrequencyInMs, timeoutInMs) {
+  var startTimeInMs = Date.now();
+  (function loopSearch() {
+    var chatButtonArray = getAllElementsWithAttribute('data-a-target', 'chat-send-button');
+    if (chatButtonArray != null && chatButtonArray.length > 0 && !chatButtonArray[0].disabled) {
+      console.log(chatButtonArray[0])
+      callback();
+      return;
+    }
+    else {
+      setTimeout(function () {
+        if (timeoutInMs && Date.now() - startTimeInMs > timeoutInMs)
+          return;
+        loopSearch();
+      }, checkFrequencyInMs);
+    }
+  })();
+}
+
+function getAllElementsWithAttribute(attribute, value) {
+  var matchingElements = [];
+  var allElements = document.getElementsByTagName('*');
+  for (var i = 0, n = allElements.length; i < n; i++)
+  {
+    if (allElements[i].getAttribute(attribute) === value)
+    {
+      // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i]);
+    }
+  }
+  return matchingElements;
 }
