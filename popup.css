@@ -61,6 +61,18 @@ hr {
   color: azure;
 }
 
+textarea {
+  background-color: rgb(70,70,72);
+  color: rgb(178,178,179);
+  resize: none;
+  overflow: hidden;
+  white-space: nowrap;
+  height: 15px;
+  width: 98%;
+  margin-left: 1%;
+  border-radius: 2px;
+}
+
 /* On mouse-over, add a deeper shadow */
 .card:hover {
   box-shadow: 0 8px 16px 0 rgba(60, 60, 60, 0.2);
