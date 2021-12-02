@@ -8,24 +8,32 @@ body {
   padding-bottom: 70px;
 }
 
+#settings {
+  margin-right: auto;
+  margin-left: 90%;
+}
+
 footer {
   background-color: rgb(25, 25, 25);
   position: fixed;
   bottom: 0;
   width: 100%;
-  margin-left: -5px;;
+  margin-left: -5px;
   padding-bottom: 10px;
 }
 
 .error-div {
-  color:red;
+  color: red;
   padding-bottom: 3px;
   font-size: small;
 }
 
-.switch-button {
-  margin-right: 0px;
-  margin-left: 95%;
+#switch-button {
+  display: inline-block;
+}
+
+#help-button {
+  display: inline-block;
 }
 
 .list-container {
@@ -104,6 +112,10 @@ button {
 .fa-trash-alt {
   color: crimson;
   margin-right: 5px;
+}
+
+.fa-question-circle {
+  color: rgb(70, 70, 72);
 }
 
 .fa-plus {

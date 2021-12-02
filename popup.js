@@ -21,6 +21,7 @@ const cardContentClass = 'card-content';
 const settingsId = 'settings';
 const addButtonId = 'add-button';
 const switchButtonId = 'switch-button';
+const helpButtonId = 'help-button';
 const deleteButtonId = 'delete-button';
 const playButtonId = 'play-button';
 const listContainerId = 'list-container';
@@ -35,6 +36,10 @@ var currentButton;
 // Start the popup script, this could be anything from a simple script to a webapp
 function initPopupScript() {
     currentButton = copyButtonClass;
+
+    document.getElementById(helpButtonId).addEventListener('click', function() {
+        document.getElementById('help-dialog').showModal();
+    }, false);
 
     document.getElementById(addButtonId).addEventListener('click', function() {
         onAdd();
@@ -103,7 +108,12 @@ function updateList() {
     }
 
     const settingsDiv = document.getElementById(settingsId);
-    settingsDiv.removeChild(settingsDiv.lastElementChild);
+    const helpButton = document.getElementById(helpButtonId);
+    child = settingsDiv.lastElementChild
+    while (child) {
+        settingsDiv.removeChild(child);
+        child = settingsDiv.lastElementChild;
+    }
 
     var switchButton = getButtonElement(switchCopyButtonClass);
     if (currentButton === copyButtonClass) {
@@ -113,6 +123,7 @@ function updateList() {
         onSwitch();
     });
     settingsDiv.appendChild(switchButton);
+    settingsDiv.appendChild(helpButton);
 
     for (var i = 0; i < savedMessages.length; ++i) {
         const item = savedMessages[i];
