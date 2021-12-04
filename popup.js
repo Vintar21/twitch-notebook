@@ -38,7 +38,7 @@ function initPopupScript() {
     currentButton = copyButtonClass;
 
     document.getElementById(helpButtonId).addEventListener('click', function() {
-        document.getElementById('help-dialog').showModal();
+        chrome.runtime.openOptionsPage();
     }, false);
 
     document.getElementById(addButtonId).addEventListener('click', function() {

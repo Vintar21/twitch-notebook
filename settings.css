@@ -1,0 +1,12 @@
+body {
+  background-color: rgb(25, 25, 25);
+  border-color: rgb(25, 25, 25);
+  color: azure;
+  align-items: center;
+  font-size: large;
+}
+
+.row {
+  align-items: center;
+  display: inline;
+}
