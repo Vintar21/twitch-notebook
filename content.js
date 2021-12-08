@@ -1,4 +1,5 @@
-window.addEventListener ("load", onReady, false);
+waitForElementToDisplay("#div1",onReady,500,9000);
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message === 'urlChanged') {
@@ -14,7 +15,7 @@ function onReady() {
   console.log('Twitch notepad ready');
   const twitchChannel = getKeyFromURL(document.location.href);
   const twitchChat = getAllElementsWithAttribute('data-a-target', 'chat-input')[0];
-  const chatButton = getAllElementsWithAttribute('data-a-target', 'chat-send-button')[0];
+  var chatButton = getAllElementsWithAttribute('data-a-target', 'chat-send-button')[0];
 
   twitchChat.addEventListener('keyup', function(event) {
     event.preventDefault();
@@ -47,7 +48,15 @@ function onReady() {
     twitchChat.focus();
     twitchChat.value = message;
     twitchChat.dispatchEvent(new Event('input', { bubbles: true }));
-    chatButton.click();
+    getChatButton().click();
+  }
+
+  function getChatButton() {
+    console.log(chatButton);
+    if(chatButton === undefined) {
+      return getAllElementsWithAttribute('data-a-target', 'chat-send-button')[0];
+    }
+    return chatButton;
   }
 }
 

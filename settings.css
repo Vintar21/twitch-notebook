@@ -4,6 +4,21 @@ body {
   color: azure;
   align-items: center;
   font-size: large;
+  display: flex;
+  flex-direction: column;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+.content {
+  flex: 0.9 0 auto;
+}
+
+.footer {
+  flex-shrink: 0;
 }
 
 .row {
