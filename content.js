@@ -53,10 +53,7 @@ function onReady() {
 
   function getChatButton() {
     console.log(chatButton);
-    if(chatButton === undefined) {
-      return getAllElementsWithAttribute('data-a-target', 'chat-send-button')[0];
-    }
-    return chatButton;
+    return getAllElementsWithAttribute('data-a-target', 'chat-send-button')[0];
   }
 }
 
